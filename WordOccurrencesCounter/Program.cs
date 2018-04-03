@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WordOccurrencesCounter
+﻿namespace WordOccurrencesCounter
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        internal static void Main(string[] args)
         {
+            IConfiguration configuration = new Configuration();
+            IFileManager fileManager = new FileManager(configuration);
+            var words = fileManager.LoadWords();
+
+            IWordCounter wordCounter = new WordCounter(configuration);
+            var occurrences = wordCounter.CountOccurences(words);
+
+            fileManager.WriteResult(occurrences);
         }
     }
 }
