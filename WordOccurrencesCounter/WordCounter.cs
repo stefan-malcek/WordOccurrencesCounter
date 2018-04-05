@@ -1,18 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using WordOccurrencesCounter.Interfaces;
 
 namespace WordOccurrencesCounter
 {
     public class WordCounter : IWordCounter
     {
-        private readonly IConfiguration _configuration;
-
-        public WordCounter(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
-
-        public Dictionary<string, int> CountOccurences(IEnumerable<string> words)
+        public Dictionary<string, int> CountOccurrences(IEnumerable<string> words, int bottomCountBoundary)
         {
             var occurrences = new Dictionary<string, int>();
             foreach (var word in words)
@@ -27,13 +21,14 @@ namespace WordOccurrencesCounter
                 }
             }
 
-            return FilterBottomCountBoundary(occurrences).ToDictionary(k => k.Key, v => v.Value);
+            return FilterBottomOccurrencesBoundary(occurrences, bottomCountBoundary)
+                .ToDictionary(k => k.Key, v => v.Value);
         }
 
-        private IEnumerable<KeyValuePair<string, int>> FilterBottomCountBoundary(Dictionary<string, int> occurrences)
+        private static IEnumerable<KeyValuePair<string, int>> FilterBottomOccurrencesBoundary(Dictionary<string, int> occurrences,
+            int bottomCountBoundary)
         {
-            return occurrences.Where(w => w.Value >= _configuration.BottomCountBoundary)
-                .OrderByDescending(o => o.Value);
+            return occurrences.Where(w => w.Value >= bottomCountBoundary).OrderByDescending(o => o.Value);
         }
     }
 }

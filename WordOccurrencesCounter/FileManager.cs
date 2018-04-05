@@ -1,36 +1,54 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using WordOccurrencesCounter.Helpers;
+using WordOccurrencesCounter.Interfaces;
 
 namespace WordOccurrencesCounter
 {
     public class FileManager : IFileManager
     {
-        private readonly IConfiguration _configuration;
+        private readonly IOutputFormatter _formatter;
 
-        public FileManager(IConfiguration configuration)
+        public FileManager(IOutputFormatter formatter)
         {
-            _configuration = configuration;
+            _formatter = formatter;
         }
 
-        public IEnumerable<string> LoadWords()
+        public bool TryToLoadStopWords(string file, out IEnumerable<string> stopwords)
         {
-            var text = File.ReadAllText(_configuration.InputFile);
-            return text.Split(_configuration.Separator).Where(w => !_configuration.IgnoredWords.Contains(w));
+            if (!File.Exists(file))
+            {
+                stopwords = new List<string>();
+                return false;
+            }
+
+            stopwords = File.ReadAllLines(file).Select(l => l.Trim(' ')).ToList();
+            return true;
         }
 
-        public void WriteResult(Dictionary<string, int> occurrences)
+        public IEnumerable<string> LoadWords(string file, IEnumerable<string> stopWords)
         {
-            using (var stream = new FileStream($"{_configuration.OutputFileName}.csv", FileMode.Create))
+            var text = File.ReadAllText(file);
+            return text.Split(' ', '\n', '\r', '\t')
+                .Select(w => w.RemovePunctuation())
+                .Where(w => !stopWords.Contains(w) && !string.IsNullOrEmpty(w));
+        }
+
+        public void WriteResult(string file, Dictionary<string, int> occurrences)
+        {
+            using (var stream = new FileStream(file, FileMode.Create))
             using (var writer = new StreamWriter(stream, Encoding.UTF8))
             {
-                writer.WriteLine("Word;Occurrences;Percentage");
+                writer.WriteLine(_formatter.FormatHeader());
 
                 var totalWordsCount = occurrences.Sum(s => s.Value);
                 foreach (var occurrence in occurrences)
                 {
-                    writer.WriteLine($"{occurrence.Key};{occurrence.Value};{(double)occurrence.Value / totalWordsCount * 100:##.###}");
+                    var percentage = Math.Round((decimal)occurrence.Value / totalWordsCount * 100, 3);
+                    writer.WriteLine(_formatter.FormatLine(occurrence.Key, occurrence.Value, percentage));
                 }
             }
         }

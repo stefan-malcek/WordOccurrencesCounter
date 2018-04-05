@@ -43,13 +43,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration.cs" />
+    <Compile Include="CsvFileFormatter.cs" />
     <Compile Include="FileManager.cs" />
-    <Compile Include="IConfiguration.cs" />
-    <Compile Include="IFileManager.cs" />
-    <Compile Include="IWordCounter.cs" />
+    <Compile Include="Interfaces\IFileManager.cs" />
+    <Compile Include="Interfaces\IOutputFormatter.cs" />
+    <Compile Include="Interfaces\IWordCounter.cs" />
+    <Compile Include="TextFileFormatter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Helpers\StringExtensions.cs" />
     <Compile Include="WordCounter.cs" />
   </ItemGroup>
   <ItemGroup>
