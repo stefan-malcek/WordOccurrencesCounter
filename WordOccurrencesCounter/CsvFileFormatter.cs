@@ -8,12 +8,12 @@ namespace WordOccurrencesCounter
     {
         public string FormatHeader()
         {
-            return $"{Program.Word};{Program.Occurrences};{Program.Percentage},";
+            return $"{Program.Word};{Program.Occurrences};{Program.Percentage}";
         }
 
         public string FormatLine(string word, int occurences, decimal percentage)
         {
-            return $"{word};{occurences};{percentage.ToString(CultureInfo.InvariantCulture)},";
+            return $"{word};{occurences};{percentage.ToString(CultureInfo.InvariantCulture)}";
         }
     }
 }
